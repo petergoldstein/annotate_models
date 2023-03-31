@@ -205,7 +205,7 @@ describe AnnotateModels do
         end
 
         it 'sets skip_subdirectory_model_load to true' do
-          is_expected.to eq(true)
+          is_expected.to be(true)
         end
       end
 
@@ -219,7 +219,7 @@ describe AnnotateModels do
         end
 
         it 'sets skip_subdirectory_model_load to false' do
-          is_expected.to eq(false)
+          is_expected.to be(false)
         end
       end
     end
@@ -1803,7 +1803,7 @@ describe AnnotateModels do
 
   describe '.set_defaults' do
     subject do
-      Annotate::Helpers.true?(ENV['show_complete_foreign_keys'])
+      Annotate::Helpers.true?(ENV.fetch('show_complete_foreign_keys', nil))
     end
 
     after :each do
@@ -2698,7 +2698,7 @@ describe AnnotateModels do
     def write_model(file_name, file_content)
       fname = File.join(@model_dir, file_name)
       FileUtils.mkdir_p(File.dirname(fname))
-      File.open(fname, 'wb') { |f| f.write file_content }
+      File.binwrite(fname, file_content)
 
       [fname, file_content]
     end
@@ -2949,11 +2949,11 @@ describe AnnotateModels do
     end
 
     describe 'frozen option' do
-      it "should abort without existing annotation when frozen: true " do
+      it "should abort without existing annotation when frozen: true" do
         expect { annotate_one_file frozen: true }.to raise_error SystemExit, /user.rb needs to be updated, but annotate was run with `--frozen`./
       end
 
-      it "should abort with different annotation when frozen: true " do
+      it "should abort with different annotation when frozen: true" do
         annotate_one_file
         another_schema_info = AnnotateModels.get_schema_info(mock_class(:users, :id, [mock_column(:id, :integer)]), '== Schema Info')
         @schema_info = another_schema_info
@@ -2961,7 +2961,7 @@ describe AnnotateModels do
         expect { annotate_one_file frozen: true }.to raise_error SystemExit, /user.rb needs to be updated, but annotate was run with `--frozen`./
       end
 
-      it "should NOT abort with same annotation when frozen: true " do
+      it "should NOT abort with same annotation when frozen: true" do
         annotate_one_file
         expect { annotate_one_file frozen: true }.not_to raise_error
       end
@@ -2982,7 +2982,7 @@ describe AnnotateModels do
     after { Object.send :remove_const, 'Foo' }
 
     it 'skips attempt to annotate if no table exists for model' do
-      is_expected.to eq nil
+      is_expected.to be_nil
     end
 
     context 'with a non-class' do
